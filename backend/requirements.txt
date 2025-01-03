@@ -1,0 +1,12 @@
+fastapi 
+uvicorn 
+sqlalchemy 
+pydantic
+psycopg2-binary
+pyjwt
+python-socketio
+python-socketio[asyncio_client]
+redis
+python-dotenv
+jose
+alembic
