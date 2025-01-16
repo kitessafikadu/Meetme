@@ -9,4 +9,7 @@ python-socketio[asyncio_client]
 redis
 python-dotenv
 jose
+python-jose
 alembic
+passlib
+pycryptodome

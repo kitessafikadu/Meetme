@@ -16,8 +16,9 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    # Define a relationship to ChatMessage
     messages = relationship("ChatMessage", back_populates="owner")
+
+    notifications = relationship("Notification", back_populates="user")
 
 
 # ChatMessage Model
@@ -51,6 +52,8 @@ class Channel(Base):
     description = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+
+# Notification Model
 class Notification(Base):
     __tablename__ = "notifications"
 

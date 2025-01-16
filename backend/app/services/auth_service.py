@@ -2,7 +2,6 @@ from app import models, schemas
 from sqlalchemy.orm import Session
 from app.core.security import create_access_token
 from fastapi import HTTPException
-
 from passlib.context import CryptContext
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -14,7 +13,7 @@ def hash_password(password: str) -> str:
 def create_user(db: Session, user: schemas.UserCreate):
     try:
         if db.query(models.User).filter(models.User.username == user.username).first():
-            raise ValueError("Username already exists")
+            raise HTTPException(status_code=400, detail="Username already exists")
 
         hashed_password = hash_password(user.password)
 
@@ -38,16 +37,14 @@ def create_user(db: Session, user: schemas.UserCreate):
         }
     except SQLAlchemyError as e:
         db.rollback()
-        raise RuntimeError("Database error occurred") from e
+        print(f"Database error occurred: {e}")  # Log the detailed error message
+        raise HTTPException(status_code=500, detail="Database error occurred")
 
-
-# Read User
 def get_user(db: Session, username: str):
     return db.query(models.User).filter(models.User.username == username).first()
 
-# Authenticate User
 def authenticate_user(db: Session, credentials: schemas.UserCreate):
     user = db.query(models.User).filter(models.User.username == credentials.username).first()
-    if not user or user.password != credentials.password:
+    if not user or not pwd_context.verify(credentials.password, user.password):
         raise HTTPException(status_code=400, detail="Invalid credentials")
     return create_access_token({"sub": user.username})

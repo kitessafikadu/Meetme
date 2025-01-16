@@ -3,6 +3,10 @@ from app.routers import auth, chat, group, channel, notifications
 
 app = FastAPI()
 
+# @app.on_event("startup")
+# async def startup():
+#     await create_db()
+
 # Include routers
 app.include_router(auth.router, prefix="/auth", tags=["Auth"])
 app.include_router(chat.router, prefix="/chat", tags=["Chat"])
