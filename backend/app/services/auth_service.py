@@ -3,13 +3,43 @@ from sqlalchemy.orm import Session
 from app.core.security import create_access_token
 from fastapi import HTTPException
 
-# Create User
+from passlib.context import CryptContext
+from sqlalchemy.exc import SQLAlchemyError
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def hash_password(password: str) -> str:
+    return pwd_context.hash(password)
+
 def create_user(db: Session, user: schemas.UserCreate):
-    db_user = models.User(username=user.username, password=user.password, first_name=user.first_name, last_name=user.last_name)
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+    try:
+        if db.query(models.User).filter(models.User.username == user.username).first():
+            raise ValueError("Username already exists")
+
+        hashed_password = hash_password(user.password)
+
+        db_user = models.User(
+            username=user.username,
+            password=hashed_password,
+            first_name=user.first_name,
+            last_name=user.last_name,
+            profile_picture=user.profile_picture or "default.jpg"
+        )
+
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+
+        return {
+            "id": db_user.id,
+            "username": db_user.username,
+            "first_name": db_user.first_name,
+            "last_name": db_user.last_name,
+        }
+    except SQLAlchemyError as e:
+        db.rollback()
+        raise RuntimeError("Database error occurred") from e
+
 
 # Read User
 def get_user(db: Session, username: str):

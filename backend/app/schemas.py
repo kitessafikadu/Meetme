@@ -8,7 +8,7 @@ class UserCreate(BaseModel):
     first_name: str
     last_name: Optional[str] = None
     password: str
-    profile_picture: Optional[str] = None  # Optional for profile picture
+    profile_picture: Optional[str] = None  
 
 class UserResponse(UserCreate):
     id: int
