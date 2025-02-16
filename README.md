@@ -1,1 +1,3 @@
-#Meetme
+# Meetme
+# Features
+# Tech stack
